@@ -2,15 +2,14 @@ package main
 
 import (
 	"fmt"
+	"github.com/spwashi/golang-images/src/utils"
+	"github.com/spwashi/golang-images/src/utils/image/output"
+	"github.com/spwashi/golang-images/src/utils/image/processing/grid"
 	"image"
 	"image/jpeg"
 	"os"
 	"os/exec"
 	"time"
-
-	"github.com/spwashi/golang-images/utils"
-	"github.com/spwashi/golang-images/utils/image/output"
-	"github.com/spwashi/golang-images/utils/image/processing/grid"
 )
 
 func main() {

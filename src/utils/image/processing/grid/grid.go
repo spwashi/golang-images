@@ -1,17 +1,13 @@
 package grid
 
 import (
+	"github.com/spwashi/golang-images/src/utils/image/processing"
 	"image"
 	"image/color"
 	"math"
-
-	"github.com/spwashi/golang-images/utils/image/processing"
 )
 
 func MakePixelGrid(img image.Image, bounds image.Rectangle, quantX int, quantY int) [][]color.RGBA64 {
-	// fmt.Println("making pixel grid ...")
-	// defer fmt.Println("... finished making pixel grid")
-
 	maxX := bounds.Max.X
 	maxY := bounds.Max.Y
 

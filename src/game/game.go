@@ -13,6 +13,7 @@ type Game struct {
 	active  bool
 	counter int
 	x, y    float64
+	vx, vy  float64
 	zoom    float64
 
 	// debugging
@@ -42,53 +43,23 @@ func NewGame() *Game {
 		logString: "",
 		x:         1,
 		y:         1,
+		vx:        5,
+		vy:        0,
 		active:    true,
 	}
 }
 
 func (g *Game) Update() error {
+	isShifted := ebiten.IsKeyPressed(ebiten.KeyShift)
+	dx, dy := ebiten.Wheel()
+	number := CheckNumericKeys()
+
 	ConsiderTouches(g)
 
+	// rate limit
 	if time.Since(g.latestPausePress) < 100*time.Millisecond {
 		return nil
 	}
-
-	// play/pause
-	if ebiten.IsKeyPressed(ebiten.KeySpace) {
-		g.bonk()
-		g.active = !g.active
-		g.latestPausePress = time.Now()
-	}
-
-	if !g.active {
-		return nil
-	}
-
-	dx, dy := ebiten.Wheel()
-	isShifted := ebiten.IsKeyPressed(ebiten.KeyShift)
-	number := CheckNumericKeys()
-
-	// zoom
-	if isShifted {
-		if number != 0 {
-			g.zoom = float64(number / 10)
-			g.logString = fmt.Sprintf("zoom: %f", g.zoom)
-			return nil
-		} else {
-			g.zoom = math.Abs(g.zoom + (dy * 0.01))
-			g.logString = fmt.Sprintf("zoom: %f", g.zoom)
-			return nil
-		}
-	} else {
-		if number != 0 {
-			g.x = float64(number * 100)
-			g.logString = fmt.Sprintf("xpos: %f", g.x)
-		} else {
-			g.x += (dx) * 10
-		}
-	}
-
-	g.counter += 1
 
 	// reset
 	if ebiten.IsKeyPressed(ebiten.KeyR) {
@@ -100,8 +71,33 @@ func (g *Game) Update() error {
 		return nil
 	}
 
+	// play/pause
+	if ebiten.IsKeyPressed(ebiten.KeySpace) {
+		g.bonk()
+		g.active = !g.active
+		g.latestPausePress = time.Now()
+	}
+
 	// move
 	delta := 1.0
+
+	if isShifted {
+		delta = 10.0
+
+		// handle zoom
+		if number != 0 {
+			g.zoom = float64(number / 10)
+			g.logString = fmt.Sprintf("zoom: %f", g.zoom)
+			return nil
+		} else if dy != 0 {
+			g.zoom = math.Abs(g.zoom + (dy * 0.01))
+			g.logString = fmt.Sprintf("zoom: %f", g.zoom)
+			return nil
+		}
+	} else if ebiten.IsKeyPressed(ebiten.KeyAlt) {
+		delta = .01
+	}
+
 	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
 		g.x -= delta
 	}
@@ -110,10 +106,31 @@ func (g *Game) Update() error {
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
 		g.y -= delta
+		g.zoom -= 0.01 * delta
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
 		g.y += delta
+		g.zoom += 0.01 * delta
 	}
+
+	if number != 0 {
+		g.x = number * 100
+		g.logString = fmt.Sprintf("xpos: %f", g.x)
+	} else {
+		g.x += (dx) * 10
+	}
+
+	if g.x < 0 || g.x > 1000 {
+		g.vx *= -1
+	}
+
+	if !g.active {
+		return nil
+	} else {
+		g.x += g.vx
+	}
+
+	g.counter += 1
 	return nil
 }
 

@@ -6,6 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/spwashi/golang-images/src/utils"
+	"golang.org/x/image/font"
 	"image/color"
 	"math"
 )
@@ -45,23 +46,20 @@ type Marker struct {
 	name  string
 }
 
-var highlightedFontFace, _ = utils.LoadFont(75)
+var highlightedFontFace, _ = utils.LoadFont(50)
+var bigOnameFontFace, _ = utils.LoadFont(50)
+var numberFontSize = float64(50)
+var numberFontFace, _ = utils.LoadFont(numberFontSize)
 
 func drawSeekers(screen *ebiten.Image, counter float64, scale float64) {
-	factor := 10
+	factor := 5
 	k := math.Abs(scale / float64(factor))
-	_, h := getImageSize(screen)
+	w, h := getImageSize(screen)
 	h -= 50
 	size := 100
 	xVal := counter * k
-	//text.Draw(screen, fmt.Sprintf("scale: %.3f/%.3f", scale, float32(factor)), tinyFontFace, 0, 58, color.RGBA{50, 50, 50, 255})
-	//text.Draw(screen, fmt.Sprintf("scale: %.3f", k), tinyFontFace, 0, 75, color.RGBA{50, 80, 50, 255})
-	text.Draw(screen, fmt.Sprintf("n:%.1f", xVal), highlightedFontFace, 50, 80, color.RGBA{90, 150, 90, 255})
-	text.Draw(screen, fmt.Sprintf("k:%.2f", k), highlightedFontFace, 500, 80, color.RGBA{90, 90, 100, 255})
-	// squares at the bottom of the screen
-
+	nColor := color.RGBA{90, 150, 90, 255}
 	y0 := float32(h - size)
-
 	shapes := []Marker{
 		{name: "n!", value: math.Gamma(xVal + 1), color: color.RGBA{R: 80, G: 0, B: 80, A: 1}},
 		{name: "2^n", value: math.Pow(2, xVal), color: color.RGBA{R: 0, G: 0, B: 80, A: 1}},
@@ -70,13 +68,44 @@ func drawSeekers(screen *ebiten.Image, counter float64, scale float64) {
 		{name: "n", value: math.Pow(xVal, 1), color: color.RGBA{R: 80, G: 80, B: 0, A: 1}},
 		{name: "log(n)", value: math.Log(xVal), color: color.RGBA{R: 0, G: 80, B: 0, A: 1}},
 	}
+	rectOffset := font.MeasureString(bigOnameFontFace, "n log(n)").Ceil() + 20
 
 	for i, shape := range shapes {
-		y := float64(y0 - float32((size+20)*i))
-		start := float32(0 + 120)
-		width := float32(shape.value)
-		vector.DrawFilledRect(screen, start, float32(y), width, float32(size), shape.color, true)
-		text.Draw(screen, fmt.Sprintf("%.2f", shape.value), tinyFontFace, 0, int(y), color.RGBA{150, 150, 150, 120})
-		text.Draw(screen, shape.name, standardFontFace, 0, int(y)+int(size)/2, color.RGBA{200, 200, 100, 200})
+		y := float64(y0 - float32((size+int(numberFontSize))*i))
+		rectWidth := float32(shape.value)
+		strWidth := font.MeasureString(bigOnameFontFace, shape.name).Ceil()
+		strOffset := (rectOffset - strWidth) / 2
+
+		vector.StrokeLine(screen, 0, float32(y), float32(w), float32(y), 2, color.RGBA{R: 120, G: 120, B: 120, A: 1}, true)
+
+		// shape name
+		text.Draw(screen, shape.name, bigOnameFontFace, strOffset, int(y)+int(size)/2, color.RGBA{200, 200, 200, 200})
+
+		// shape value
+		text.Draw(screen, fmt.Sprintf("%.2f", shape.value), numberFontFace, rectOffset, int(y+numberFontSize), nColor)
+
+		// value rect
+		vector.DrawFilledRect(screen, float32(rectOffset), float32(y), rectWidth, float32(size), shape.color, true)
 	}
+
+	xStr := fmt.Sprintf("x:%d", int(counter))
+	xStrWidth := font.MeasureString(highlightedFontFace, xStr).Ceil()
+	kStr := fmt.Sprintf("k:%.2f", k)
+	kStrWidth := font.MeasureString(highlightedFontFace, kStr).Ceil()
+	nStr := fmt.Sprintf("n:%.1f", xVal)
+	nStrWidth := font.MeasureString(highlightedFontFace, nStr).Ceil()
+
+	offsetX := 10
+	offsetY := 60
+	gray := color.RGBA{90, 90, 100, 255}
+	text.Draw(screen, xStr, highlightedFontFace, offsetX, offsetY, gray)
+	offsetX = offsetX + xStrWidth + 50
+	text.Draw(screen, kStr, highlightedFontFace, offsetX, offsetY, gray)
+	offsetX = offsetX + kStrWidth + 50
+	text.Draw(screen, nStr, highlightedFontFace, offsetX, offsetY, nColor)
+	offsetX = offsetX + nStrWidth + 100
+	// draw the formula k * x = n
+	text.Draw(screen, "k * x =  ", highlightedFontFace, offsetX, 60, color.RGBA{90, 60, 100, 255})
+	text.Draw(screen, "k   x    ", highlightedFontFace, offsetX, 60, gray)
+	text.Draw(screen, "        n", highlightedFontFace, offsetX, 60, nColor)
 }

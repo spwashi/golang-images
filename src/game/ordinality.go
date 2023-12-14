@@ -8,13 +8,25 @@ import (
 	"image/color"
 )
 
+var standardFontFace, _ = utils.LoadFont(20)
+var tinyFontFace, _ = utils.LoadFont(17)
+
 func DrawGamePosition(screen *ebiten.Image, g *Game) {
-	var face, _ = utils.LoadFont(30)
-	x, y := getAvatarPos(g, screen)
-	text.Draw(screen, fmt.Sprintf("x: %d, y: %d", int(x), int(y)), face, 30, 30, color.White)
+	avatarX, avatarY := getAvatarPos(g, screen)
 	w, h := getImageSize(screen)
-	text.Draw(screen, fmt.Sprintf("w: %d, h: %d", w, h), face, 30, 60, color.White)
-	text.Draw(screen, fmt.Sprintf("c: %d", g.counter), face, 30, 90, color.White)
-	text.Draw(screen, fmt.Sprintf("z: %f", g.zoom), face, 30, 120, color.White)
-	text.Draw(screen, fmt.Sprintf("l: %s", g.log), face, 30, 150, color.White)
+
+	textPosX := w * 3 / 4
+	dy := 30
+	yPos := 0
+	face := tinyFontFace
+	yPos += dy
+	text.Draw(screen, fmt.Sprintf("x: %d, y: %d", int(avatarX), int(avatarY)), face, textPosX, yPos, color.White)
+	yPos += dy
+	text.Draw(screen, fmt.Sprintf("w: %d, h: %d", w, h), face, textPosX, yPos, color.White)
+	yPos += dy
+	text.Draw(screen, fmt.Sprintf("c: %d", g.counter), face, textPosX, yPos, color.White)
+	yPos += dy
+	text.Draw(screen, fmt.Sprintf("z: %f", g.zoom), face, textPosX, yPos, color.White)
+	yPos += dy
+	text.Draw(screen, fmt.Sprintf("log: %s", g.logString), face, textPosX, yPos, color.White)
 }

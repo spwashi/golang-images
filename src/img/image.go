@@ -55,7 +55,6 @@ func generateImage(img image.Image, bounds image.Rectangle, xGap int, yGap int) 
 }
 
 func runFfmpeg(framerate int) {
-
 	cmd := exec.Command(
 		"ffmpeg",
 		"-y",

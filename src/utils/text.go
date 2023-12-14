@@ -3,11 +3,11 @@ package utils
 import (
 	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/font"
-	"golang.org/x/image/font/gofont/goregular"
+	"golang.org/x/image/font/gofont/gomonobold"
 )
 
 func LoadFont(size float64) (font.Face, error) {
-	ttfFont, err := truetype.Parse(goregular.TTF)
+	ttfFont, err := truetype.Parse(gomonobold.TTF)
 	if err != nil {
 		return nil, err
 	}

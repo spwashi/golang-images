@@ -35,15 +35,14 @@ type Game struct {
 	audioPlayer *audio.Player
 }
 
-func NewGame(audioPlayer *audio.Player) *Game {
+func NewGame() *Game {
 	return &Game{
-		counter:     0,
-		zoom:        1,
-		logString:   "",
-		x:           1,
-		y:           1,
-		audioPlayer: audioPlayer,
-		active:      true,
+		counter:   0,
+		zoom:      1,
+		logString: "",
+		x:         1,
+		y:         1,
+		active:    true,
 	}
 }
 
@@ -154,12 +153,17 @@ func CheckNumericKeys() float64 {
 }
 
 func (g *Game) bonk() {
+	if g.audioPlayer == nil {
+		audioPlayer := initAudioContext()
+		defer audioPlayer.Close()
+		g.audioPlayer = audioPlayer
+	}
 	//g.audioPlayer.Rewind()
 	//g.audioPlayer.Play()
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	DrawBackground(screen, g)
+	//DrawBackground(screen, g)
 	DrawGamePosition(screen, g)
 	DrawAvatar(screen, g)
 }
@@ -169,14 +173,11 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func main() {
-	audioPlayer := initAudioContext()
-	defer audioPlayer.Close()
-
 	ebiten.SetWindowSize(ScreenWidth, ScreenHeight)
 	ebiten.SetWindowTitle("Move the Square")
 	ebiten.SetFullscreen(true)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
-	game := NewGame(audioPlayer)
+	game := NewGame()
 	if err := ebiten.RunGame(game); err != nil {
 		panic(err)
 	}

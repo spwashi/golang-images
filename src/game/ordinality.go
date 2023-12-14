@@ -14,6 +14,9 @@ var tinyFontFace, _ = utils.LoadFont(17)
 func DrawGamePosition(screen *ebiten.Image, g *Game) {
 	avatarX, avatarY := getAvatarPos(g, screen)
 	w, h := getImageSize(screen)
+	if true {
+		return
+	}
 
 	textPosX := w * 3 / 4
 	dy := 30
@@ -28,5 +31,5 @@ func DrawGamePosition(screen *ebiten.Image, g *Game) {
 	yPos += dy
 	text.Draw(screen, fmt.Sprintf("z: %f", g.zoom), face, textPosX, yPos, color.White)
 	yPos += dy
-	text.Draw(screen, fmt.Sprintf("log: %s", g.logString), face, textPosX, yPos, color.White)
+	text.Draw(screen, fmt.Sprintf("@: %s", g.logString), face, textPosX, yPos, color.White)
 }

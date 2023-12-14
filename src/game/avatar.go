@@ -5,6 +5,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	"github.com/spwashi/golang-images/src/utils"
 	"image/color"
 	"math"
 )
@@ -44,6 +45,8 @@ type Marker struct {
 	name  string
 }
 
+var highlightedFontFace, _ = utils.LoadFont(75)
+
 func drawSeekers(screen *ebiten.Image, counter float64, scale float64) {
 	factor := 10
 	k := math.Abs(scale / float64(factor))
@@ -51,9 +54,10 @@ func drawSeekers(screen *ebiten.Image, counter float64, scale float64) {
 	h -= 50
 	size := 100
 	xVal := counter * k
-	text.Draw(screen, fmt.Sprintf("scale: %.3f/%.3f", scale, float32(factor)), standardFontFace, 0, 20, color.RGBA{G: 255, A: 255})
-	text.Draw(screen, fmt.Sprintf("scale: %.3f", k), standardFontFace, 0, 50, color.RGBA{G: 255, A: 255})
-	text.Draw(screen, fmt.Sprintf("n: %.2f", xVal), standardFontFace, 0, 100, color.RGBA{G: 255, A: 255})
+	//text.Draw(screen, fmt.Sprintf("scale: %.3f/%.3f", scale, float32(factor)), tinyFontFace, 0, 58, color.RGBA{50, 50, 50, 255})
+	//text.Draw(screen, fmt.Sprintf("scale: %.3f", k), tinyFontFace, 0, 75, color.RGBA{50, 80, 50, 255})
+	text.Draw(screen, fmt.Sprintf("n:%.1f", xVal), highlightedFontFace, 50, 80, color.RGBA{90, 150, 90, 255})
+	text.Draw(screen, fmt.Sprintf("k:%.2f", k), highlightedFontFace, 500, 80, color.RGBA{90, 90, 100, 255})
 	// squares at the bottom of the screen
 
 	y0 := float32(h - size)
@@ -69,7 +73,9 @@ func drawSeekers(screen *ebiten.Image, counter float64, scale float64) {
 
 	for i, shape := range shapes {
 		y := float64(y0 - float32((size+20)*i))
-		vector.DrawFilledRect(screen, float32(shape.value+50), float32(y), float32(size), float32(size), shape.color, true)
+		start := float32(0 + 50)
+		width := float32(shape.value)
+		vector.DrawFilledRect(screen, start, float32(y), width, float32(size), shape.color, true)
 
 		text.Draw(screen, fmt.Sprintf("%.2f", shape.value), standardFontFace, 0, int(y), color.White)
 

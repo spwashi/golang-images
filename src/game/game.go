@@ -101,17 +101,18 @@ func (g *Game) Update() error {
 	}
 
 	// move
+	delta := 1.0
 	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
-		g.x -= 20
+		g.x -= delta
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
-		g.x += 20
+		g.x += delta
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
-		g.y -= 20
+		g.y -= delta
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
-		g.y += 20
+		g.y += delta
 	}
 	return nil
 }

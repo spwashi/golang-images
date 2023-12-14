@@ -73,13 +73,10 @@ func drawSeekers(screen *ebiten.Image, counter float64, scale float64) {
 
 	for i, shape := range shapes {
 		y := float64(y0 - float32((size+20)*i))
-		start := float32(0 + 50)
+		start := float32(0 + 120)
 		width := float32(shape.value)
 		vector.DrawFilledRect(screen, start, float32(y), width, float32(size), shape.color, true)
-
-		text.Draw(screen, fmt.Sprintf("%.2f", shape.value), standardFontFace, 0, int(y), color.White)
-
-		text.Draw(screen, shape.name, standardFontFace, int(shape.value+50), int(y)+int(size)/2, color.White)
+		text.Draw(screen, fmt.Sprintf("%.2f", shape.value), tinyFontFace, 0, int(y), color.RGBA{150, 150, 150, 120})
+		text.Draw(screen, shape.name, standardFontFace, 0, int(y)+int(size)/2, color.RGBA{200, 200, 100, 200})
 	}
-
 }
